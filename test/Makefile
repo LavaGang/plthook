@@ -114,4 +114,28 @@ relro_pie_tests_on_valgrind:
 	$(MAKE) run_tests "EXTRA_CFLAGS=-m32 -Wl,-z,relro,-z,now" KICK_CMD=valgrind
 
 clean:
-	$(RM) libtest.$(SOEXT) testprog$(EXEEXT)
+	$(RM) libtest.$(SOEXT) testprog$(EXEEXT) chained-test macho-slice-test libchained-*.dylib
+
+# Chained fixups must be requested explicitly: older deployment targets use
+# LC_DYLD_INFO_ONLY and would silently miss the universal-file regression.
+MACOS_TEST_ARCH ?= $(shell uname -m)
+MACOS_CHAIN_FLAGS = -mmacosx-version-min=13.0 -Wl,-fixup_chains
+
+macos_chained_tests:
+	$(CC) $(CFLAGS) -arch $(MACOS_TEST_ARCH) -I.. chained-test.c ../plthook_osx.c -o chained-test
+	$(CC) $(CFLAGS) -arch $(MACOS_TEST_ARCH) macho-slice-test.c -o macho-slice-test
+	./macho-slice-test
+	$(CC) $(CFLAGS) $(MACOS_CHAIN_FLAGS) -arch $(MACOS_TEST_ARCH) -dynamiclib libchained.c -o libchained-thin.dylib
+	$(CC) $(CFLAGS) $(MACOS_CHAIN_FLAGS) -arch x86_64 -arch arm64 -dynamiclib libchained.c -o libchained-universal.dylib
+	lipo libchained-universal.dylib -create -fat64 -output libchained-fat64.dylib
+	@set -e; for library in thin universal fat64; do \
+		for mode in open open_by_handle open_by_address; do \
+			./chained-test ./libchained-$$library.dylib $$mode; \
+		done; \
+	done
+
+.PHONY: macos_chained_tests
+
+ifeq ($(UNAME_S),Darwin)
+run_tests: macos_chained_tests
+endif
