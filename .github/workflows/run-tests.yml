@@ -1,7 +1,5 @@
 name: tests
 on:
-  push:
-  pull_request:
   workflow_dispatch:
     inputs:
       tests_on_ubuntu:

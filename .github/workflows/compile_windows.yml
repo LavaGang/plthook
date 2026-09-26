@@ -1,0 +1,47 @@
+on:
+  workflow_call:
+
+jobs:
+  compile_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup MSYS2 and MinGW32
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: >-
+            mingw-w64-i686-toolchain
+            mingw-w64-i686-cmake
+
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v3
+
+      - name: Build Release for win-x86
+        run: make TARGET=win-x86
+
+      - name: Build Release for win-x64
+        run: make TARGET=win-x64
+
+      - name: Build Release for win-arm64
+        run: make TARGET=win-arm64
+
+      - name: Upload Release for win-x86
+        uses: actions/upload-artifact@v7
+        with:
+          name: Windows.x86
+          path: build/win-x86
+
+      - name: Upload Release for win-x64
+        uses: actions/upload-artifact@v7
+        with:
+          name: Windows.x64
+          path: build/win-x64
+
+      - name: Upload Release for win-arm64
+        uses: actions/upload-artifact@v7
+        with:
+          name: Windows.arm64
+          path: build/win-arm64

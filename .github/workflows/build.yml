@@ -1,0 +1,21 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  compile_windows:
+    name: Windows
+    uses: ./.github/workflows/compile_windows.yml
+
+  compile_linux:
+    name: Linux
+    uses: ./.github/workflows/compile_linux.yml
+
+  compile_macos:
+    name: MacOS
+    uses: ./.github/workflows/compile_macos.yml

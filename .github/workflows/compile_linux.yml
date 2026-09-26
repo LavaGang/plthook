@@ -1,0 +1,44 @@
+on:
+  workflow_call:
+
+jobs:
+  compile_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-multilib \
+            g++-multilib \
+            libc6-dev-i386
+
+      - name: Build Release for linux-x86
+        run: make TARGET=linux-x86
+
+      - name: Build Release for linux-x64
+        run: make TARGET=linux-x64
+
+      - name: Build Release for linux-arm64
+        run: make TARGET=linux-arm64
+
+      - name: Upload Release for linux-x86
+        uses: actions/upload-artifact@v7
+        with:
+          name: Linux.x86
+          path: build/linux-x86
+
+      - name: Upload Release for linux-x64
+        uses: actions/upload-artifact@v7
+        with:
+          name: Linux.x64
+          path: build/linux-x64
+
+      - name: Upload Release for linux-arm64
+        uses: actions/upload-artifact@v7
+        with:
+          name: Linux.arm64
+          path: build/linux-arm64

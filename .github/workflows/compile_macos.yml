@@ -1,0 +1,26 @@
+on:
+  workflow_call:
+
+jobs:
+  compile_macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build Release for osx-x64
+        run: make TARGET=osx-x64
+
+      - name: Build Release for osx-arm64
+        run: make TARGET=osx-arm64
+
+      - name: Upload Release for osx-x64
+        uses: actions/upload-artifact@v7
+        with:
+          name: MacOS.x64
+          path: build/osx-x64
+
+      - name: Upload Release for osx-arm64
+        uses: actions/upload-artifact@v7
+        with:
+          name: MacOS.arm64
+          path: build/osx-arm64
