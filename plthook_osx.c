@@ -43,6 +43,9 @@
 #include <errno.h>
 #include <mach/mach.h>
 #include <mach-o/dyld.h>
+#include <mach-o/fat.h>
+#include <libkern/OSByteOrder.h>
+#include <sys/stat.h>
 #include <sys/mman.h>
 #include <mach-o/fixup-chains.h>
 #include "plthook.h"
@@ -670,6 +673,8 @@ static void set_bind_addr(data_t *data, unsigned int *idx, const char *sym_name,
 typedef struct {
     const char *image_name;
     FILE *fp;
+	off_t slice_offset;
+	off_t slice_size;
     const struct dyld_chained_starts_in_image *starts;
     uint32_t seg_index; // i
     uint16_t page_index; // j
@@ -692,12 +697,82 @@ typedef struct {
     off_t offset;
 } chianed_fixups_entry_t;
 
-static int chained_fixups_iter_init(chained_fixups_iter_t *iter, const char *image_name, const struct dyld_chained_starts_in_image *starts_offset);
+static int chained_fixups_iter_init(chained_fixups_iter_t *iter, const char *image_name, const struct mach_header *mh, const struct dyld_chained_starts_in_image *starts_offset);
 static void chained_fixups_iter_deinit(chained_fixups_iter_t *iter);
 static int chained_fixups_iter_rewind(chained_fixups_iter_t *iter);
 static int chained_fixups_iter_next(chained_fixups_iter_t *iter, chianed_fixups_entry_t *entry);
 
-static int chained_fixups_iter_init(chained_fixups_iter_t *iter, const char *image_name, const struct dyld_chained_starts_in_image *starts)
+/* File offsets in load commands and fixup chains are relative to a Mach-O
+ * slice, whereas fopen() sees the entire universal binary. Match the header
+ * dyld actually loaded, including its CPU subtype, instead of the host CPU. */
+static int get_macho_slice(FILE *fp, const struct mach_header *mh, off_t *slice_offset, off_t *slice_size) {
+	struct stat st;
+	struct fat_header fat;
+	uint32_t count;
+	uint64_t table_end;
+	int swap, is64;
+
+	if (fstat(fileno(fp), &st) != 0 || st.st_size < (off_t)sizeof(*mh) ||
+		fseeko(fp, 0, SEEK_SET) != 0 || fread(&fat, sizeof(fat), 1, fp) != 1) {
+		goto invalid;
+	}
+	if (fat.magic == mh->magic) {
+		*slice_offset = 0;
+		*slice_size = st.st_size;
+		return 0;
+	}
+	if (fat.magic != FAT_MAGIC && fat.magic != FAT_CIGAM &&
+		fat.magic != FAT_MAGIC_64 && fat.magic != FAT_CIGAM_64) {
+		goto invalid;
+	}
+	swap = fat.magic == FAT_CIGAM || fat.magic == FAT_CIGAM_64;
+	is64 = fat.magic == FAT_MAGIC_64 || fat.magic == FAT_CIGAM_64;
+	count = swap ? OSSwapInt32(fat.nfat_arch) : fat.nfat_arch;
+	table_end = sizeof(fat) + (uint64_t)count * (is64 ? sizeof(struct fat_arch_64) : sizeof(struct fat_arch));
+	if (table_end > (uint64_t)st.st_size) {
+		goto invalid;
+	}
+	for (uint32_t i = 0; i < count; i++) {
+		uint32_t cpu, subtype;
+		uint64_t offset, size;
+		if (is64) {
+			struct fat_arch_64 arch;
+			if (fread(&arch, sizeof(arch), 1, fp) != 1) {
+				goto invalid;
+			}
+			cpu = swap ? OSSwapInt32(arch.cputype) : (uint32_t)arch.cputype;
+			subtype = swap ? OSSwapInt32(arch.cpusubtype) : (uint32_t)arch.cpusubtype;
+			offset = swap ? OSSwapInt64(arch.offset) : arch.offset;
+			size = swap ? OSSwapInt64(arch.size) : arch.size;
+		} else {
+			struct fat_arch arch;
+			if (fread(&arch, sizeof(arch), 1, fp) != 1) {
+				goto invalid;
+			}
+			cpu = swap ? OSSwapInt32(arch.cputype) : (uint32_t)arch.cputype;
+			subtype = swap ? OSSwapInt32(arch.cpusubtype) : (uint32_t)arch.cpusubtype;
+			offset = swap ? OSSwapInt32(arch.offset) : arch.offset;
+			size = swap ? OSSwapInt32(arch.size) : arch.size;
+		}
+		if (cpu == (uint32_t)mh->cputype && subtype == (uint32_t)mh->cpusubtype) {
+			if (offset < table_end || offset > (uint64_t)st.st_size ||
+				size < sizeof(*mh) || size > (uint64_t)st.st_size - offset) {
+				goto invalid;
+			}
+			*slice_offset = (off_t)offset;
+			*slice_size = (off_t)size;
+			return 0;
+		}
+	}
+	set_errmsg("no universal Mach-O slice matches the loaded CPU type and subtype");
+	return PLTHOOK_INVALID_FILE_FORMAT;
+
+invalid:
+	set_errmsg("invalid Mach-O file or universal architecture table");
+	return PLTHOOK_INVALID_FILE_FORMAT;
+}
+
+static int chained_fixups_iter_init(chained_fixups_iter_t *iter, const char *image_name, const struct mach_header *mh, const struct dyld_chained_starts_in_image *starts)
 {
     memset(iter, 0, sizeof(*iter));
     iter->fp = fopen(image_name, "r");
@@ -705,6 +780,11 @@ static int chained_fixups_iter_init(chained_fixups_iter_t *iter, const char *ima
         set_errmsg("failed to open file %s (error: %s)", image_name, strerror(errno));
         return PLTHOOK_FILE_NOT_FOUND;
     }
+	int rv = get_macho_slice(iter->fp, mh, &iter->slice_offset, &iter->slice_size);
+	if (rv != 0) {
+		chained_fixups_iter_deinit(iter);
+		return rv;
+	}
     iter->image_name = image_name;
     iter->starts = starts;
     return 0;
@@ -778,7 +858,12 @@ next_page:
     if (offset == 0) {
         offset = seg->segment_offset + j * seg->page_size + seg->page_start[j];
     }
-    if (fseeko(iter->fp, offset, SEEK_SET) != 0) {
+	if (offset < 0 || offset > iter->slice_size ||
+		(uint64_t)(iter->slice_size - offset) < sizeof(entry->ptr)) {
+		set_errmsg("fixup chain offset is outside the Mach-O slice in %s", iter->image_name);
+		return PLTHOOK_INVALID_FILE_FORMAT;
+	}
+    if (fseeko(iter->fp, iter->slice_offset + offset, SEEK_SET) != 0) {
         set_errmsg("failed to seek to %lld in %s", offset, iter->image_name);
         return PLTHOOK_INVALID_FILE_FORMAT;
     }
@@ -820,7 +905,7 @@ static int read_chained_fixups(data_t *d, const struct mach_header *mh, const ch
     chained_fixups_iter_t iter = {NULL, };
     chianed_fixups_entry_t entry;
 
-    rv = chained_fixups_iter_init(&iter, image_name, starts);
+    rv = chained_fixups_iter_init(&iter, image_name, mh, starts);
     if (rv != 0) {
         return rv;
     }
