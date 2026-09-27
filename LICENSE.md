@@ -1,5 +1,5 @@
 The BSD 2-Clause License
-Copyright © 2013 kubo
+Copyright © 2013-2024 Kubo Takehiro <kubo@jiubao.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
