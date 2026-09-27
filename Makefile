@@ -38,7 +38,7 @@ SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-LIB    := $(BUILD_DIR)/plthook.a
+LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
 
@@ -47,7 +47,7 @@ AR     ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-LIB    := $(BUILD_DIR)/plthook.a
+LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
 
@@ -56,7 +56,7 @@ AR     ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-LIB    := $(BUILD_DIR)/plthook.a
+LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),osx-x64)
 
