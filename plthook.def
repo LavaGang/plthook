@@ -1,0 +1,12 @@
+LIBRARY plthook
+
+EXPORTS
+    plthook_open
+    plthook_open_by_handle
+    plthook_open_by_address
+    plthook_enum
+    plthook_enum_entry
+    plthook_enum_with_prot
+    plthook_replace
+    plthook_close
+    plthook_error
