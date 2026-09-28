@@ -39,6 +39,7 @@ LIB := $(BUILD_DIR)/libplthook.a
 else ifeq ($(TARGET),win-x86)
 
 CC ?= i686-w64-mingw32-gcc
+AR ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -m32
@@ -50,6 +51,7 @@ LIB := $(BUILD_DIR)/plthook.lib
 else ifeq ($(TARGET),win-x64)
 
 CC ?= x86_64-w64-mingw32-gcc
+AR ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DAMD64
@@ -61,6 +63,7 @@ LIB := $(BUILD_DIR)/plthook.lib
 else ifeq ($(TARGET),win-arm64)
 
 CC ?= aarch64-w64-mingw32-gcc
+AR ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DARM64
@@ -102,6 +105,13 @@ $(LIB): $(OBJECT)
 	@mkdir -p "$(BUILD_DIR)"
 	$(AR) $(ARFLAGS) "$@" "$^"
 
+$(OBJECT): $(SOURCE) plthook.h
+	@echo "  CC      $@"
+	@mkdir -p "$(BUILD_DIR)"
+	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
+	      $(CFLAGS) $(TARGET_CFLAGS) \
+	      -c "$<" -o "$@"
+
 ifneq ($(DLL),)
 
 $(DLL): $(OBJECT) $(DEF_FILE)
@@ -121,13 +131,6 @@ $(LIB): $(DLL)
 	@echo "  IMPORT  $@"
 
 endif
-
-$(OBJECT): $(SOURCE) plthook.h
-	@echo "  CC      $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
-	      $(CFLAGS) $(TARGET_CFLAGS) \
-	      -c "$<" -o "$@"
 
 .PHONY: \
 	$(BUILD_DIR)
