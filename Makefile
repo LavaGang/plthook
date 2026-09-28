@@ -40,11 +40,10 @@ CC ?= cl
 AR ?= lib
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := -m32
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-
 LIB := $(BUILD_DIR)/plthook.lib
-LIBFLAGS := /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+
+TARGET_CFLAGS := -m32 /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),win-x64)
 
@@ -52,11 +51,10 @@ CC ?= cl
 AR ?= lib
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := -DAMD64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-
 LIB := $(BUILD_DIR)/plthook.lib
-LIBFLAGS := /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+
+TARGET_CFLAGS := -DAMD64 /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),win-arm64)
 
@@ -64,11 +62,10 @@ CC ?= cl
 AR ?= lib
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := -DARM64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-
 LIB := $(BUILD_DIR)/plthook.lib
-LIBFLAGS := /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+
+TARGET_CFLAGS := -DARM64 /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),osx-x64)
 
@@ -103,21 +100,21 @@ ifeq ($(TARGET),win-x86)
 $(LIB): $(OBJECT)
 	@echo " AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" $(LIBFLAGS) "$<"
+	$(AR) /OUT:"$@" "$<"
 
 else ifeq ($(TARGET),win-x64)
 
 $(LIB): $(OBJECT)
 	@echo " AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" $(LIBFLAGS) "$<"
+	$(AR) /OUT:"$@" "$<"
 
 else ifeq ($(TARGET),win-arm64)
 
 $(LIB): $(OBJECT)
 	@echo " AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" $(LIBFLAGS) "$<"
+	$(AR) /OUT:"$@" "$<"
 
 else
 
