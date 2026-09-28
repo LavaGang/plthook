@@ -6,8 +6,8 @@ ARFLAGS ?= rcs
 
 ifeq ($(TARGET),linux-x86)
 
-CC ?= gcc
-AR ?= ar
+CC := gcc
+AR := ar
 
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
@@ -16,8 +16,8 @@ TARGET_CFLAGS := -m32 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),linux-x64)
 
-CC ?= gcc
-AR ?= ar
+CC := gcc
+AR := ar
 
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
@@ -26,8 +26,8 @@ TARGET_CFLAGS := -DAMD64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),linux-arm64)
 
-CC ?= aarch64-linux-gnu-gcc
-AR ?= aarch64-linux-gnu-ar
+CC := gcc
+AR := ar
 
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
@@ -36,8 +36,8 @@ TARGET_CFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),win-x86)
 
-CC ?= cl
-AR ?= lib
+CC := gcc
+AR := ar
 
 SOURCE := plthook_win32.c
 DEF := $(BUILD_DIR)/plthook_win32.def
@@ -48,8 +48,8 @@ TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),win-x64)
 
-CC ?= cl
-AR ?= lib
+CC := gcc
+AR := ar
 
 SOURCE := plthook_win32.c
 DEF := $(BUILD_DIR)/plthook_win32.def
@@ -60,8 +60,8 @@ TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),win-arm64)
 
-CC ?= cl
-AR ?= lib
+CC := gcc
+AR := ar
 
 SOURCE := plthook_win32.c
 DEF := $(BUILD_DIR)/plthook_win32.def
@@ -72,8 +72,8 @@ TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),osx-x64)
 
-CC ?= clang
-AR ?= ar
+CC := clang
+AR := ar
 
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
@@ -82,8 +82,8 @@ TARGET_CFLAGS := -DAMD64 -exported_symbols_list plthook_osx.def
 
 else ifeq ($(TARGET),osx-arm64)
 
-CC ?= clang
-AR ?= ar
+CC := clang
+AR := ar
 
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
