@@ -77,7 +77,7 @@ AR := ar
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -DAMD64
+TARGET_CPPFLAGS := -DAMD64 -mmacosx-version-min=12.0
 TARGET_CFLAGS := --target=x86_64-apple-darwin
 
 else ifeq ($(TARGET),osx-arm64)
@@ -88,7 +88,7 @@ AR := ar
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -DARM64
+TARGET_CPPFLAGS := -DARM64 -mmacosx-version-min=12.0
 TARGET_CFLAGS := --target=arm64-apple-darwin
 
 else ifneq ($(TARGET),all)
