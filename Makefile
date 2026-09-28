@@ -37,34 +37,36 @@ TARGET_CPPFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),win-x86)
 
-CC := gcc
+CC := clang
 AR := ar
 
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-TARGET_CFLAGS := -m32
+TARGET_CFLAGS := --target=i686-pc-windows-msvc
 
 else ifeq ($(TARGET),win-x64)
 
-CC := gcc
+CC := clang
 AR := ar
 
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64
+TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
 
 else ifeq ($(TARGET),win-arm64)
 
-CC := gcc
+CC := clang
 AR := ar
 
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64
+TARGET_CFLAGS := --target=aarch64-pc-windows-msvc
 
 else ifeq ($(TARGET),osx-x64)
 
