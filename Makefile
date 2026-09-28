@@ -36,7 +36,7 @@ CC     ?= clang
 AR     ?= ar
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := --target=i686-pc-windows-msvc
+TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 LIB    := $(BUILD_DIR)/plthook.lib
 
@@ -46,7 +46,7 @@ CC     ?= clang
 AR     ?= ar
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
+TARGET_CFLAGS := -DAMD64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -ldbghelp
 LIB    := $(BUILD_DIR)/plthook.lib
 
@@ -56,7 +56,7 @@ CC     ?= clang
 AR     ?= ar
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := --target=aarch64-pc-windows-msvc
+TARGET_CFLAGS := -DARM64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 LIB    := $(BUILD_DIR)/plthook.lib
 
