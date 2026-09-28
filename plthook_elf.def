@@ -1,0 +1,8 @@
+{
+    global:
+        plthook_close;
+        plthook_error;
+        plthook_open;
+        plthook_replace;
+    local: *;
+};

@@ -9,6 +9,7 @@ ifeq ($(TARGET),linux-x86)
 CC     ?= gcc
 AR     ?= ar
 SOURCE := plthook_elf.c
+DEF := plthook_elf.def
 
 TARGET_CFLAGS := -m32
 LIB    := $(BUILD_DIR)/libplthook.a
@@ -18,6 +19,7 @@ else ifeq ($(TARGET),linux-x64)
 CC     ?= gcc
 AR     ?= ar
 SOURCE := plthook_elf.c
+DEF := plthook_elf.def
 
 TARGET_CFLAGS := -DAMD64
 LIB    := $(BUILD_DIR)/libplthook.a
@@ -27,6 +29,7 @@ else ifeq ($(TARGET),linux-arm64)
 CC     ?= aarch64-linux-gnu-gcc
 AR     ?= aarch64-linux-gnu-ar
 SOURCE := plthook_elf.c
+DEF := plthook_elf.def
 
 TARGET_CFLAGS := -DARM64
 LIB    := $(BUILD_DIR)/libplthook.a
@@ -36,6 +39,7 @@ else ifeq ($(TARGET),win-x86)
 CC     ?= i686-w64-mingw32-gcc
 AR     ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
+DEF := plthook_win32.def
 
 TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
@@ -46,6 +50,7 @@ else ifeq ($(TARGET),win-x64)
 CC     ?= x86_64-w64-mingw32-gcc
 AR     ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
+DEF := plthook_win32.def
 
 TARGET_CFLAGS := -DAMD64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
@@ -56,6 +61,7 @@ else ifeq ($(TARGET),win-arm64)
 CC     ?= aarch64-w64-mingw32-gcc
 AR     ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
+DEF := plthook_win32.def
 
 TARGET_CFLAGS := -DARM64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
@@ -66,6 +72,7 @@ else ifeq ($(TARGET),osx-x64)
 CC     ?= clang
 AR     ?= ar
 SOURCE := plthook_osx.c
+DEF := plthook_osx.def
 
 TARGET_CFLAGS := -DAMD64
 LIB    := $(BUILD_DIR)/libplthook.a
@@ -75,6 +82,7 @@ else ifeq ($(TARGET),osx-arm64)
 CC     ?= clang
 AR     ?= ar
 SOURCE := plthook_osx.c
+DEF := plthook_osx.def
 
 TARGET_CFLAGS := -DARM64
 LIB    := $(BUILD_DIR)/libplthook.a
@@ -97,6 +105,7 @@ $(OBJECT): $(SOURCE) plthook.h
 	@mkdir -p "$(BUILD_DIR)"
 	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
 	      $(CFLAGS) $(TARGET_CFLAGS) \
+	      -Wl,$(DEF) \
 	      -c "$<" -o "$@"
 
 .PHONY: \
