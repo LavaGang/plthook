@@ -47,23 +47,25 @@
 
 typedef struct plthook plthook_t;
 
-#ifdef __cplusplus
-extern "C" {
+#if defined(_WIN32) || defined(__CYGWIN__)
+#  define PLTHOOK_API __declspec(dllimport)
+#else
+#  define PLTHOOK_API __attribute__((visibility("default")))
 #endif
 
-int plthook_open(plthook_t **plthook_out, const char *filename);
-int plthook_open_by_handle(plthook_t **plthook_out, void *handle);
-int plthook_open_by_address(plthook_t **plthook_out, void *address);
-int plthook_enum(plthook_t *plthook, unsigned int *pos, const char **name_out, void ***addr_out);
-int plthook_replace(plthook_t *plthook, const char *funcname, void *funcaddr, void **oldfunc);
-void plthook_close(plthook_t *plthook);
-const char *plthook_error(void);
+PLTHOOK_API int plthook_open(plthook_t **plthook_out, const char *filename);
+PLTHOOK_API int plthook_open_by_handle(plthook_t **plthook_out, void *handle);
+PLTHOOK_API int plthook_open_by_address(plthook_t **plthook_out, void *address);
+PLTHOOK_API int plthook_enum(plthook_t *plthook, unsigned int *pos, const char **name_out, void ***addr_out);
+PLTHOOK_API int plthook_replace(plthook_t *plthook, const char *funcname, void *funcaddr, void **oldfunc);
+PLTHOOK_API void plthook_close(plthook_t *plthook);
+PLTHOOK_API const char *plthook_error(void);
 
 /* enumerate entries with memory protection information (bitwise-OR of PROT_READ, PROT_WRITE and PROT_EXEC)
  *
  * source: plthook_elf.c and plthook_osx.c
  */
-int plthook_enum_with_prot(plthook_t *plthook, unsigned int *pos, const char **name_out, void ***addr_out, int *prot);
+PLTHOOK_API int plthook_enum_with_prot(plthook_t *plthook, unsigned int *pos, const char **name_out, void ***addr_out, int *prot);
 
 typedef struct {
     const char *name;
@@ -76,10 +78,6 @@ typedef struct {
 #endif
 } plthook_entry_t;
 
-int plthook_enum_entry(plthook_t *plthook, unsigned int *pos, plthook_entry_t *entry);
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+PLTHOOK_API int plthook_enum_entry(plthook_t *plthook, unsigned int *pos, plthook_entry_t *entry);
 
 #endif

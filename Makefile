@@ -36,7 +36,7 @@ LIB := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),win-x86)
 
-CC ?= i686-w64-mingw32-g++
+CC ?= i686-w64-mingw32-gcc
 AR ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
@@ -47,7 +47,7 @@ LIB := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
 
-CC ?= x86_64-w64-mingw32-g++
+CC ?= x86_64-w64-mingw32-gcc
 AR ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
@@ -58,7 +58,7 @@ LIB := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
 
-CC ?= aarch64-w64-mingw32-g++
+CC ?= aarch64-w64-mingw32-gcc
 AR ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
