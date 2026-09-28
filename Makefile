@@ -1,7 +1,14 @@
 BUILD_DIR := build/$(TARGET)
 
 CFLAGS   ?= -O2 -Wall -Wextra
-CPPFLAGS ?= -I. -M -MT /MT
+CPPFLAGS ?= -I. -M -MT /MT \
+	      -exported_symbol,plthook_open \
+	      -exported_symbol,plthook_open_by_handle \
+	      -exported_symbol,plthook_open_by_address \
+	      -exported_symbol,plthook_enum \
+	      -exported_symbol,plthook_replace \
+	      -exported_symbol,plthook_close \
+	      -exported_symbol,plthook_error
 ARFLAGS  ?= rcs
 
 ifeq ($(TARGET),linux-x86)
@@ -36,12 +43,9 @@ else ifeq ($(TARGET),win-x86)
 CC     ?= i686-w64-mingw32-gcc
 AR     ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
-DEF := plthook_win32.def
 
 TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-
-DLL    := $(BUILD_DIR)/plthook.dll
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
@@ -49,12 +53,9 @@ else ifeq ($(TARGET),win-x64)
 CC     ?= x86_64-w64-mingw32-gcc
 AR     ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
-DEF := plthook_win32.def
 
 TARGET_CFLAGS := -DAMD64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-
-DLL    := $(BUILD_DIR)/plthook.dll
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
@@ -62,12 +63,9 @@ else ifeq ($(TARGET),win-arm64)
 CC     ?= aarch64-w64-mingw32-gcc
 AR     ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
-DEF := plthook_win32.def
 
 TARGET_CFLAGS := -DARM64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
-
-DLL    := $(BUILD_DIR)/plthook.dll
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),osx-x64)
@@ -96,35 +94,10 @@ endif
 
 OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
 
-ifneq ($(DLL),)
-
-$(DLL): $(OBJECT) $(DEF)
-	@echo "  LD      $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(CC) $(TARGET_CFLAGS) \
-	      -shared \
-	      -Wl,--output-def,"$(DEF)" \
-	      -Wl,--out-implib,"$(LIB)" \
-	      -Wl,--kill-at \
-	      -Wl,"$(DEF)" \
-	      "$<" \
-	      -o "$@"
-
-$(LIB): $(DLL)
-	@:
-
-else
-
-# ----------------------------------------------------------------------
-# Linux / macOS static libraries
-# ----------------------------------------------------------------------
-
 $(LIB): $(OBJECT)
 	@echo "  AR      $@"
 	@mkdir -p "$(BUILD_DIR)"
 	$(AR) $(ARFLAGS) "$@" "$^"
-
-endif
 
 $(OBJECT): $(SOURCE) plthook.h
 	@echo "  CC      $@"
