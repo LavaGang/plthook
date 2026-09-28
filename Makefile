@@ -44,7 +44,7 @@ TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 LIB := $(BUILD_DIR)/plthook.lib
-ARFLAGS ?= /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+LIBFLAGS ?= /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
 
 else ifeq ($(TARGET),win-x64)
 
@@ -56,7 +56,7 @@ TARGET_CFLAGS := -DAMD64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 LIB := $(BUILD_DIR)/plthook.lib
-ARFLAGS ?= /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+LIBFLAGS ?= /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
 
 else ifeq ($(TARGET),win-arm64)
 
@@ -68,7 +68,7 @@ TARGET_CFLAGS := -DARM64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 LIB := $(BUILD_DIR)/plthook.lib
-ARFLAGS ?= /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+LIBFLAGS ?= /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
 
 else ifeq ($(TARGET),osx-x64)
 
@@ -103,21 +103,21 @@ ifeq ($(TARGET),win-x86)
 $(LIB): $(OBJECT)
 	@echo " AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" $(ARFLAGS) "$<"
+	$(AR) /OUT:"$@" $(LIBFLAGS) "$<"
 
 else ifeq ($(TARGET),win-x64)
 
 $(LIB): $(OBJECT)
 	@echo " AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" $(ARFLAGS) "$<"
+	$(AR) /OUT:"$@" $(LIBFLAGS) "$<"
 
 else ifeq ($(TARGET),win-arm64)
 
 $(LIB): $(OBJECT)
 	@echo " AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" $(ARFLAGS) "$<"
+	$(AR) /OUT:"$@" $(LIBFLAGS) "$<"
 
 else
 
