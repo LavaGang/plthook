@@ -1,18 +1,8 @@
 BUILD_DIR := build/$(TARGET)
 
 CFLAGS := -O2 -Wall -Wextra
-CPPFLAGS := -I. -M -MT /MT
+CPPFLAGS := -I. -MMD -MP
 ARFLAGS := rcs
-
-EXFLAGS := -Wl,-exported_symbol,plthook_open \
--Wl,-exported_symbol,plthook_open_by_handle \
--Wl,-exported_symbol,plthook_open_by_address \
--Wl,-exported_symbol,plthook_enum \
--Wl,-exported_symbol,plthook_enum_entry \
--Wl,-exported_symbol,plthook_enum_with_prot \
--Wl,-exported_symbol,plthook_replace \
--Wl,-exported_symbol,plthook_close \
--Wl,-exported_symbol,_plthook_error
 
 ifeq ($(TARGET),linux-x86)
 
@@ -22,7 +12,8 @@ AR := ar
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -m32 -Wl,--version-script,plthook_elf.def
+TARGET_CPPFLAGS := -Wl,--version-script,plthook_elf.def
+TARGET_CFLAGS := -m32
 
 else ifeq ($(TARGET),linux-x64)
 
@@ -32,7 +23,7 @@ AR := ar
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DAMD64 -Wl,--version-script,plthook_elf.def
+TARGET_CPPFLAGS := -DAMD64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),linux-arm64)
 
@@ -42,7 +33,7 @@ AR := ar
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
+TARGET_CPPFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),win-x86)
 
@@ -52,8 +43,8 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 TARGET_CFLAGS := -m32
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
 
 else ifeq ($(TARGET),win-x64)
 
@@ -63,8 +54,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CFLAGS := -DAMD64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64
 
 else ifeq ($(TARGET),win-arm64)
 
@@ -74,8 +64,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CFLAGS := -DARM64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64
 
 else ifeq ($(TARGET),osx-x64)
 
@@ -85,7 +74,7 @@ AR := ar
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DAMD64 -exported_symbols_list plthook_osx.def
+TARGET_CPPFLAGS := -DAMD64 -exported_symbols_list plthook_osx.def
 
 else ifeq ($(TARGET),osx-arm64)
 
@@ -95,7 +84,7 @@ AR := ar
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DARM64 -exported_symbols_list plthook_osx.def
+TARGET_CPPFLAGS := -DARM64 -exported_symbols_list plthook_osx.def
 
 else ifneq ($(TARGET),all)
 
@@ -104,6 +93,7 @@ $(error Unknown TARGET '$(TARGET)')
 endif
 
 OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
+DEPFILE := $(OBJECT:.o=.d)
 
 $(LIB): $(OBJECT)
 	@echo "AR $@"
@@ -115,7 +105,9 @@ $(OBJECT): $(SOURCE) plthook.h
 	@mkdir -p "$(BUILD_DIR)"
 	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
 	      $(CFLAGS) $(TARGET_CFLAGS) \
-	      -pie "$<" -o "$@"
+	      -c "$<" -o "$@"
+
+-include $(DEPFILE)
 
 .PHONY: \
 	$(BUILD_DIR)
@@ -148,9 +140,9 @@ all:
 	$(MAKE) TARGET=linux-x86
 	$(MAKE) TARGET=linux-x64
 	$(MAKE) TARGET=linux-arm64
-	$(MAKE) TARGET=windows-x86
-	$(MAKE) TARGET=windows-x64
-	$(MAKE) TARGET=windows-arm64
+	$(MAKE) TARGET=win-x86
+	$(MAKE) TARGET=win-x64
+	$(MAKE) TARGET=win-arm64
 	$(MAKE) TARGET=osx-x64
 	$(MAKE) TARGET=osx-arm64
 
