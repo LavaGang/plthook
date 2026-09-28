@@ -1,5 +1,3 @@
-LIBRARY plthook
-
 EXPORTS
     plthook_open
     plthook_open_by_handle

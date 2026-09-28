@@ -1,0 +1,9 @@
+_plthook_open
+_plthook_open_by_handle
+_plthook_open_by_address
+_plthook_enum
+_plthook_enum_entry
+_plthook_enum_with_prot
+_plthook_replace
+_plthook_close
+_plthook_error
