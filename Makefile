@@ -47,7 +47,7 @@ AR     ?= ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DAMD64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -ldbghelp
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
