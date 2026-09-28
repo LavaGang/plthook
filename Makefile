@@ -32,29 +32,31 @@ LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),win-x86)
 
-CC     ?= i686-w64-mingw32-gcc
-AR     ?= i686-w64-mingw32-ar
+CC     ?= clang
+AR     ?= ar
 SOURCE := plthook_win32.c
 
-TARGET_CFLAGS := -m32
+TARGET_CFLAGS := --target=i686-pc-windows-msvc
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
 
-CC     ?= x86_64-w64-mingw32-gcc
-AR     ?= x86_64-w64-mingw32-ar
+CC     ?= clang
+AR     ?= ar
 SOURCE := plthook_win32.c
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -ldbghelp
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
 
-CC     ?= aarch64-w64-mingw32-gcc
-AR     ?= aarch64-w64-mingw32-ar
+CC     ?= clang
+AR     ?= ar
 SOURCE := plthook_win32.c
 
+TARGET_CFLAGS := --target=aarch64-pc-windows-msvc
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 LIB    := $(BUILD_DIR)/plthook.lib
 
