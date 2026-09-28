@@ -1,15 +1,17 @@
 BUILD_DIR := build/$(TARGET)
 
 CFLAGS   ?= -O2 -Wall -Wextra
-CPPFLAGS ?= -I. -M -MT /MT \
-	      -exported_symbol,plthook_open \
-	      -exported_symbol,plthook_open_by_handle \
-	      -exported_symbol,plthook_open_by_address \
-	      -exported_symbol,plthook_enum \
-	      -exported_symbol,plthook_replace \
-	      -exported_symbol,plthook_close \
-	      -exported_symbol,plthook_error
+CPPFLAGS ?= -I. -M -MT /MT
 ARFLAGS  ?= rcs
+
+EXFLAGS  ?= \
+	-exported_symbol,plthook_open \
+	-exported_symbol,plthook_open_by_handle \
+	-exported_symbol,plthook_open_by_address \
+	-exported_symbol,plthook_enum \
+	-exported_symbol,plthook_replace \
+	-exported_symbol,plthook_close \
+	-exported_symbol,plthook_error
 
 ifeq ($(TARGET),linux-x86)
 
@@ -18,6 +20,8 @@ AR     ?= ar
 SOURCE := plthook_elf.c
 
 TARGET_CFLAGS := -m32
+TARGET_CPPFLAGS := $(EXFLAGS)
+
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),linux-x64)
@@ -27,6 +31,8 @@ AR     ?= ar
 SOURCE := plthook_elf.c
 
 TARGET_CFLAGS := -DAMD64
+TARGET_CPPFLAGS := $(EXFLAGS)
+
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),linux-arm64)
@@ -36,6 +42,8 @@ AR     ?= aarch64-linux-gnu-ar
 SOURCE := plthook_elf.c
 
 TARGET_CFLAGS := -DARM64
+TARGET_CPPFLAGS := $(EXFLAGS)
+
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),win-x86)
@@ -45,7 +53,8 @@ AR     ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -m32
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
+
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
@@ -55,7 +64,8 @@ AR     ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DAMD64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
+
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
@@ -65,7 +75,8 @@ AR     ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DARM64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
+
 LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),osx-x64)
@@ -75,6 +86,7 @@ AR     ?= ar
 SOURCE := plthook_osx.c
 
 TARGET_CFLAGS := -DAMD64
+
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),osx-arm64)
@@ -84,6 +96,7 @@ AR     ?= ar
 SOURCE := plthook_osx.c
 
 TARGET_CFLAGS := -DARM64
+
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifneq ($(TARGET),all)
