@@ -4,8 +4,6 @@ CFLAGS ?= -O2 -Wall -Wextra
 CPPFLAGS ?= -I. -M -MT /MT
 ARFLAGS ?= rcs
 
-DEF_FILE := plthook.def
-
 ifeq ($(TARGET),linux-x86)
 
 CC ?= gcc
@@ -38,38 +36,35 @@ LIB := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),win-x86)
 
-CC ?= i686-w64-mingw32-gcc
+CC ?= i686-w64-mingw32-clang
 AR ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
-DLL := $(BUILD_DIR)/plthook.dll
 LIB := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
 
-CC ?= x86_64-w64-mingw32-gcc
+CC ?= x86_64-w64-mingw32-clang
 AR ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DAMD64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
-DLL := $(BUILD_DIR)/plthook.dll
 LIB := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
 
-CC ?= aarch64-w64-mingw32-gcc
+CC ?= aarch64-w64-mingw32-clang
 AR ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DARM64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
-DLL := $(BUILD_DIR)/plthook.dll
 LIB := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),osx-x64)

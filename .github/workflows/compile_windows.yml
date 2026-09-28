@@ -7,6 +7,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Setup MSYS2 and MinGW32
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: >-
+            mingw-w64-i686-toolchain
+            mingw-w64-i686-cmake
+
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v3
 
