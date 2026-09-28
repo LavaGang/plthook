@@ -47,6 +47,10 @@
 
 typedef struct plthook plthook_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(_WIN32) || defined(__CYGWIN__)
 #  define PLTHOOK_API __declspec(dllimport)
 #else
@@ -65,7 +69,7 @@ PLTHOOK_API const char *plthook_error(void);
  *
  * source: plthook_elf.c and plthook_osx.c
  */
-PLTHOOK_API int plthook_enum_with_prot(plthook_t *plthook, unsigned int *pos, const char **name_out, void ***addr_out, int *prot);
+int plthook_enum_with_prot(plthook_t *plthook, unsigned int *pos, const char **name_out, void ***addr_out, int *prot);
 
 typedef struct {
     const char *name;
@@ -78,6 +82,10 @@ typedef struct {
 #endif
 } plthook_entry_t;
 
-PLTHOOK_API int plthook_enum_entry(plthook_t *plthook, unsigned int *pos, plthook_entry_t *entry);
+int plthook_enum_entry(plthook_t *plthook, unsigned int *pos, plthook_entry_t *entry);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif
