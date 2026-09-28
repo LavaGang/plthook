@@ -40,11 +40,10 @@ CC := gcc
 AR := ar
 
 SOURCE := plthook_win32.c
-DEF := $(BUILD_DIR)/plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -m32
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Wl,/DEF:plthook_win32.def
 
 else ifeq ($(TARGET),win-x64)
 
@@ -52,11 +51,10 @@ CC := gcc
 AR := ar
 
 SOURCE := plthook_win32.c
-DEF := $(BUILD_DIR)/plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -DAMD64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Wl,/DEF:plthook_win32.def
 
 else ifeq ($(TARGET),win-arm64)
 
@@ -64,11 +62,10 @@ CC := gcc
 AR := ar
 
 SOURCE := plthook_win32.c
-DEF := $(BUILD_DIR)/plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -DARM64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Wl,/DEF:plthook_win32.def
 
 else ifeq ($(TARGET),osx-x64)
 
@@ -98,7 +95,7 @@ endif
 
 OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
 
-$(LIB): $(OBJECT) $(DEF)
+$(LIB): $(OBJECT)
 	@echo "AR $@"
 	@mkdir -p "$(BUILD_DIR)"
 	$(AR) $(ARFLAGS) "$@" "$^"
@@ -108,7 +105,7 @@ $(OBJECT): $(SOURCE) plthook.h
 	@mkdir -p "$(BUILD_DIR)"
 	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
 	      $(CFLAGS) $(TARGET_CFLAGS) \
-	      -c "$<" -o "$@"
+	      -pie "$<" -o "$@"
 
 .PHONY: \
 	$(BUILD_DIR)
