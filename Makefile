@@ -1,11 +1,8 @@
 BUILD_DIR := build/$(TARGET)
 
-CFLAGS   ?= -O2
-CPPFLAGS ?= -I.
+CFLAGS   ?= -O2 -Wall -Wextra
+CPPFLAGS ?= -I. -M -MT /MT
 ARFLAGS  ?= rcs
-
-# Don't inherit these from the environment accidentally.
-override CFLAGS += -Wall -Wextra
 
 ifeq ($(TARGET),linux-x86)
 
@@ -21,6 +18,8 @@ else ifeq ($(TARGET),linux-x64)
 CC     ?= gcc
 AR     ?= ar
 SOURCE := plthook_elf.c
+
+TARGET_CFLAGS := -DAMD64
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),linux-arm64)
@@ -28,12 +27,14 @@ else ifeq ($(TARGET),linux-arm64)
 CC     ?= aarch64-linux-gnu-gcc
 AR     ?= aarch64-linux-gnu-ar
 SOURCE := plthook_elf.c
+
+TARGET_CFLAGS := -DARM64
 LIB    := $(BUILD_DIR)/libplthook.a
 
 else ifeq ($(TARGET),win-x86)
 
-CC     ?= clang
-AR     ?= ar
+CC     ?= i686-w64-mingw32-gcc
+AR     ?= i686-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -m32
@@ -42,8 +43,8 @@ LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-x64)
 
-CC     ?= clang
-AR     ?= ar
+CC     ?= x86_64-w64-mingw32-gcc
+AR     ?= x86_64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DAMD64
@@ -52,8 +53,8 @@ LIB    := $(BUILD_DIR)/plthook.lib
 
 else ifeq ($(TARGET),win-arm64)
 
-CC     ?= clang
-AR     ?= ar
+CC     ?= aarch64-w64-mingw32-gcc
+AR     ?= aarch64-w64-mingw32-ar
 SOURCE := plthook_win32.c
 
 TARGET_CFLAGS := -DARM64
