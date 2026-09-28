@@ -8,84 +8,92 @@ ifeq ($(TARGET),linux-x86)
 
 CC ?= gcc
 AR ?= ar
+
 SOURCE := plthook_elf.c
-
-TARGET_CFLAGS := -m32 -Wl,--version-script,plthook_elf.def
-
+DEF := plthook_elf.def
 LIB := $(BUILD_DIR)/libplthook.a
+
+TARGET_CFLAGS := -m32 -Wl,--version-script,$(DEF)
 
 else ifeq ($(TARGET),linux-x64)
 
 CC ?= gcc
 AR ?= ar
+
 SOURCE := plthook_elf.c
-
-TARGET_CFLAGS := -DAMD64 -Wl,--version-script,plthook_elf.def
-
+DEF := plthook_elf.def
 LIB := $(BUILD_DIR)/libplthook.a
+
+TARGET_CFLAGS := -DAMD64 -Wl,--version-script,$(DEF)
 
 else ifeq ($(TARGET),linux-arm64)
 
 CC ?= aarch64-linux-gnu-gcc
 AR ?= aarch64-linux-gnu-ar
+
 SOURCE := plthook_elf.c
-
-TARGET_CFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
-
+DEF := plthook_elf.def
 LIB := $(BUILD_DIR)/libplthook.a
+
+TARGET_CFLAGS := -DARM64 -Wl,--version-script,$(DEF)
 
 else ifeq ($(TARGET),win-x86)
 
 CC ?= cl
 AR ?= lib
-SOURCE := plthook_win32.c
 
+SOURCE := plthook_win32.c
+DEF := plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CFLAGS := -m32 /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+TARGET_CFLAGS := -m32
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),win-x64)
 
 CC ?= cl
 AR ?= lib
-SOURCE := plthook_win32.c
 
+SOURCE := plthook_win32.c
+DEF := plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CFLAGS := -DAMD64 /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+TARGET_CFLAGS := -DAMD64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),win-arm64)
 
 CC ?= cl
 AR ?= lib
-SOURCE := plthook_win32.c
 
+SOURCE := plthook_win32.c
+DEF := plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CFLAGS := -DARM64 /DEF:"plthook_win32.def" /IMPLIB:"$(LIB)"
+TARGET_CFLAGS := -DARM64
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 
 else ifeq ($(TARGET),osx-x64)
 
 CC ?= clang
 AR ?= ar
+
 SOURCE := plthook_osx.c
-
-TARGET_CFLAGS := -DAMD64 -exported_symbols_list plthook_osx.def
-
+DEF := plthook_osx.def
 LIB := $(BUILD_DIR)/libplthook.a
+
+TARGET_CFLAGS := -DAMD64 -exported_symbols_list $(DEF)
 
 else ifeq ($(TARGET),osx-arm64)
 
 CC ?= clang
 AR ?= ar
+
 SOURCE := plthook_osx.c
-
-TARGET_CFLAGS := -DARM64 -exported_symbols_list plthook_osx.def
-
+DEF := plthook_osx.def
 LIB := $(BUILD_DIR)/libplthook.a
+
+TARGET_CFLAGS := -DARM64 -exported_symbols_list $(DEF)
 
 else ifneq ($(TARGET),all)
 
@@ -97,36 +105,25 @@ OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
 
 ifeq ($(TARGET),win-x86)
 
-$(LIB): $(OBJECT)
-	@echo " AR $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" "$<"
+OBJECT := $(OBJECT) $(DEF)
 
 else ifeq ($(TARGET),win-x64)
 
-$(LIB): $(OBJECT)
-	@echo " AR $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" "$<"
+OBJECT := $(OBJECT) $(DEF)
 
 else ifeq ($(TARGET),win-arm64)
 
-$(LIB): $(OBJECT)
-	@echo " AR $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(AR) /OUT:"$@" "$<"
-
-else
-
-$(LIB): $(OBJECT)
-	@echo " AR $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(AR) $(ARFLAGS) "$@" "$^"
+OBJECT := $(OBJECT) $(DEF)
 
 endif
 
+$(LIB): $(OBJECT)
+	@echo "AR $@"
+	@mkdir -p "$(BUILD_DIR)"
+	$(AR) $(ARFLAGS) "$@" "$^"
+
 $(OBJECT): $(SOURCE) plthook.h
-	@echo "  CC      $@"
+	@echo "CC $@"
 	@mkdir -p "$(BUILD_DIR)"
 	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
 	      $(CFLAGS) $(TARGET_CFLAGS) \
