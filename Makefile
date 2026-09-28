@@ -6,34 +6,35 @@ ARFLAGS := rcs
 
 ifeq ($(TARGET),linux-x86)
 
-CC := gcc
+CC := clang
 AR := ar
 
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -Wl,--version-script,plthook_elf.def
-TARGET_CFLAGS := -m32
+TARGET_CFLAGS := -m32 --target=i686-pc-linux-gnu
 
 else ifeq ($(TARGET),linux-x64)
 
-CC := gcc
+CC := clang
 AR := ar
 
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -DAMD64 -Wl,--version-script,plthook_elf.def
+TARGET_CPPFLAGS := -DAMD64
+TARGET_CFLAGS := --target=x86_64-pc-linux-gnu
 
 else ifeq ($(TARGET),linux-arm64)
 
-CC := gcc
+CC := clang
 AR := ar
 
 SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
+TARGET_CPPFLAGS := -DARM64
+TARGET_CFLAGS := --target=arm64-pc-linux-gnu
 
 else ifeq ($(TARGET),win-x86)
 
@@ -43,7 +44,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Winconsistent-dllimport
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 TARGET_CFLAGS := --target=i686-pc-windows-msvc
 
 else ifeq ($(TARGET),win-x64)
@@ -54,7 +55,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64 -Winconsistent-dllimport
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64
 TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
 
 else ifeq ($(TARGET),win-arm64)
@@ -65,8 +66,8 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64 -Winconsistent-dllimport
-TARGET_CFLAGS := --target=aarch64-pc-windows-msvc
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64
+TARGET_CFLAGS := --target=arm64-pc-windows-msvc
 
 else ifeq ($(TARGET),osx-x64)
 
@@ -76,7 +77,8 @@ AR := ar
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -DAMD64 -exported_symbols_list plthook_osx.def
+TARGET_CPPFLAGS := -DAMD64
+TARGET_CFLAGS := --target=x86_64-apple-darwin
 
 else ifeq ($(TARGET),osx-arm64)
 
@@ -86,7 +88,8 @@ AR := ar
 SOURCE := plthook_osx.c
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CPPFLAGS := -DARM64 -exported_symbols_list plthook_osx.def
+TARGET_CPPFLAGS := -DARM64
+TARGET_CFLAGS := --target=arm64-apple-darwin
 
 else ifneq ($(TARGET),all)
 

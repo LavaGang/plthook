@@ -22,8 +22,8 @@ jobs:
       - name: Build Release for linux-x64
         run: make TARGET=linux-x64
 
-      - name: Build Release for linux-arm64
-        run: make TARGET=linux-arm64
+      #- name: Build Release for linux-arm64
+      #  run: make TARGET=linux-arm64
 
       - name: Upload Release for linux-x86
         uses: actions/upload-artifact@v7
@@ -37,8 +37,8 @@ jobs:
           name: Linux.x64
           path: build/linux-x64
 
-      - name: Upload Release for linux-arm64
-        uses: actions/upload-artifact@v7
-        with:
-          name: Linux.arm64
-          path: build/linux-arm64
+      #- name: Upload Release for linux-arm64
+      #  uses: actions/upload-artifact@v7
+      #  with:
+      #    name: Linux.arm64
+      #    path: build/linux-arm64
