@@ -100,17 +100,17 @@ endif
 
 OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
 
-$(LIB): $(OBJECT)
-	@echo "  AR      $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(AR) $(ARFLAGS) "$@" "$^"
-
 $(OBJECT): $(SOURCE) plthook.h
 	@echo "  CC      $@"
 	@mkdir -p "$(BUILD_DIR)"
 	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
 	      $(CFLAGS) $(TARGET_CFLAGS) \
 	      -c "$<" -o "$@"
+
+$(LIB): $(OBJECT)
+	@echo "  AR      $@"
+	@mkdir -p "$(BUILD_DIR)"
+	$(AR) $(ARFLAGS) "$@" "$^"
 
 ifneq ($(DLL),)
 
