@@ -100,37 +100,17 @@ endif
 
 OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
 
-$(OBJECT): $(SOURCE) plthook.h
-	@echo "  CC      $@"
-	@mkdir -p "$(BUILD_DIR)"
-	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
-	      $(CFLAGS) $(TARGET_CFLAGS) \
-	      -c "$<" -o "$@"
-
 $(LIB): $(OBJECT)
 	@echo "  AR      $@"
 	@mkdir -p "$(BUILD_DIR)"
 	$(AR) $(ARFLAGS) "$@" "$^"
 
-ifneq ($(DLL),)
-
-$(DLL): $(OBJECT) $(DEF_FILE)
-	@echo "  LINK    $@"
+$(OBJECT): $(SOURCE) plthook.def plthook.h
+	@echo "  CC      $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(CC) $(TARGET_CFLAGS) \
-	      -static \
-	      -Wl,--out-implib,"$(LIB)" \
-	      -Wl,--output-def,"$(BUILD_DIR)/plthook-generated.def" \
-	      -o "$@" \
-	      $(OBJECT) \
-	      "$(DEF_FILE)"
-
-.PHONY: $(LIB)
-
-$(LIB): $(DLL)
-	@echo "  IMPORT  $@"
-
-endif
+	$(CC) $(CPPFLAGS) $(TARGET_CPPFLAGS) \
+	      $(CFLAGS) $(TARGET_CFLAGS) \
+	      -c "$<" -o "$@"
 
 .PHONY: \
 	$(BUILD_DIR)
