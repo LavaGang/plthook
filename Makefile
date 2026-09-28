@@ -1,8 +1,18 @@
 BUILD_DIR := build/$(TARGET)
 
-CFLAGS ?= -O2 -Wall -Wextra
-CPPFLAGS ?= -I. -M -MT /MT
-ARFLAGS ?= rcs
+CFLAGS := -O2 -Wall -Wextra
+CPPFLAGS := -I. -M -MT /MT
+ARFLAGS := rcs
+
+EXFLAGS := -Wl,-exported_symbol,plthook_open \
+-Wl,-exported_symbol,plthook_open_by_handle \
+-Wl,-exported_symbol,plthook_open_by_address \
+-Wl,-exported_symbol,plthook_enum \
+-Wl,-exported_symbol,plthook_enum_entry \
+-Wl,-exported_symbol,plthook_enum_with_prot \
+-Wl,-exported_symbol,plthook_replace \
+-Wl,-exported_symbol,plthook_close \
+-Wl,-exported_symbol,_plthook_error
 
 ifeq ($(TARGET),linux-x86)
 
@@ -43,7 +53,7 @@ SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -m32
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Wl,/DEF:plthook_win32.def
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
 
 else ifeq ($(TARGET),win-x64)
 
@@ -54,7 +64,7 @@ SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -DAMD64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Wl,/DEF:plthook_win32.def
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
 
 else ifeq ($(TARGET),win-arm64)
 
@@ -65,7 +75,7 @@ SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -DARM64
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Wl,/DEF:plthook_win32.def
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 $(EXFLAGS)
 
 else ifeq ($(TARGET),osx-x64)
 
