@@ -43,7 +43,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -Winconsistent-dllimport
 TARGET_CFLAGS := --target=i686-pc-windows-msvc
 
 else ifeq ($(TARGET),win-x64)
@@ -54,7 +54,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64 -Winconsistent-dllimport
 TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
 
 else ifeq ($(TARGET),win-arm64)
@@ -65,7 +65,7 @@ AR := ar
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
 
-TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64
+TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64 -Winconsistent-dllimport
 TARGET_CFLAGS := --target=aarch64-pc-windows-msvc
 
 else ifeq ($(TARGET),osx-x64)
