@@ -10,10 +10,9 @@ CC ?= gcc
 AR ?= ar
 
 SOURCE := plthook_elf.c
-DEF := plthook_elf.def
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -m32 -Wl,--version-script,$(DEF)
+TARGET_CFLAGS := -m32 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),linux-x64)
 
@@ -21,10 +20,9 @@ CC ?= gcc
 AR ?= ar
 
 SOURCE := plthook_elf.c
-DEF := plthook_elf.def
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DAMD64 -Wl,--version-script,$(DEF)
+TARGET_CFLAGS := -DAMD64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),linux-arm64)
 
@@ -32,10 +30,9 @@ CC ?= aarch64-linux-gnu-gcc
 AR ?= aarch64-linux-gnu-ar
 
 SOURCE := plthook_elf.c
-DEF := plthook_elf.def
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DARM64 -Wl,--version-script,$(DEF)
+TARGET_CFLAGS := -DARM64 -Wl,--version-script,plthook_elf.def
 
 else ifeq ($(TARGET),win-x86)
 
@@ -43,7 +40,7 @@ CC ?= cl
 AR ?= lib
 
 SOURCE := plthook_win32.c
-DEF := plthook_win32.def
+DEF := $(BUILD_DIR)/plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -m32
@@ -55,7 +52,7 @@ CC ?= cl
 AR ?= lib
 
 SOURCE := plthook_win32.c
-DEF := plthook_win32.def
+DEF := $(BUILD_DIR)/plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -DAMD64
@@ -67,7 +64,7 @@ CC ?= cl
 AR ?= lib
 
 SOURCE := plthook_win32.c
-DEF := plthook_win32.def
+DEF := $(BUILD_DIR)/plthook_win32.def
 LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CFLAGS := -DARM64
@@ -79,10 +76,9 @@ CC ?= clang
 AR ?= ar
 
 SOURCE := plthook_osx.c
-DEF := plthook_osx.def
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DAMD64 -exported_symbols_list $(DEF)
+TARGET_CFLAGS := -DAMD64 -exported_symbols_list plthook_osx.def
 
 else ifeq ($(TARGET),osx-arm64)
 
@@ -90,10 +86,9 @@ CC ?= clang
 AR ?= ar
 
 SOURCE := plthook_osx.c
-DEF := plthook_osx.def
 LIB := $(BUILD_DIR)/libplthook.a
 
-TARGET_CFLAGS := -DARM64 -exported_symbols_list $(DEF)
+TARGET_CFLAGS := -DARM64 -exported_symbols_list plthook_osx.def
 
 else ifneq ($(TARGET),all)
 
@@ -103,21 +98,7 @@ endif
 
 OBJECT := $(BUILD_DIR)/$(SOURCE:.c=.o)
 
-ifeq ($(TARGET),win-x86)
-
-OBJECT := $(OBJECT) $(DEF)
-
-else ifeq ($(TARGET),win-x64)
-
-OBJECT := $(OBJECT) $(DEF)
-
-else ifeq ($(TARGET),win-arm64)
-
-OBJECT := $(OBJECT) $(DEF)
-
-endif
-
-$(LIB): $(OBJECT)
+$(LIB): $(OBJECT) $(DEF)
 	@echo "AR $@"
 	@mkdir -p "$(BUILD_DIR)"
 	$(AR) $(ARFLAGS) "$@" "$^"
