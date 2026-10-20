@@ -28,7 +28,7 @@ jobs:
       run:
         working-directory: test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Install packages
       run: |
         sudo apt update
@@ -78,7 +78,7 @@ jobs:
       run:
         working-directory: test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Install packages
       run: |
         sudo apt update
@@ -134,7 +134,7 @@ jobs:
       run:
         working-directory: test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: make
       run: |
         make clean libtest.so testprog
@@ -170,7 +170,7 @@ jobs:
         shell: cmd
         working-directory: test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - uses: ilammy/msvc-dev-cmd@v1
     - name: x64 without optimization
       run: |
