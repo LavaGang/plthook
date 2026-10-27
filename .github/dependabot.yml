@@ -5,12 +5,6 @@
 
 version: 2
 updates:
-  - package-ecosystem: "nuget" # See documentation for possible values
-    target-branch: "master"
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "daily"
-
   - package-ecosystem: "github-actions"
     target-branch: "master"
     # Workflow files stored in the
