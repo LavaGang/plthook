@@ -2,7 +2,7 @@ BUILD_DIR := build/$(TARGET)
 
 CFLAGS := -O2 -Wall -Wextra
 CPPFLAGS := -I. -MMD -MP
-ARFLAGS := rcs "$@"
+ARFLAGS := rcs
 
 ifeq ($(TARGET),linux-x86)
 
@@ -109,7 +109,7 @@ DEPFILE := $(OBJECT:.o=.d)
 $(LIB): $(OBJECT)
 	@echo "AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) $(ARFLAGIDENTIDIER) "$^"
+	$(AR) $(ARFLAGS) "$^"
 
 $(OBJECT): $(SOURCE) plthook.h
 	@echo "CC $@"
