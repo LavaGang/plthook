@@ -2,7 +2,7 @@ BUILD_DIR := build/$(TARGET)
 
 CFLAGS := -O2 -Wall -Wextra
 CPPFLAGS := -I. -MMD -MP
-ARFLAGS := rcs "$@"
+ARFLAGS := rcs
 
 ifeq ($(TARGET),linux-x86)
 
@@ -47,8 +47,6 @@ LIB := $(BUILD_DIR)/plthook.lib
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32
 TARGET_CFLAGS := --target=i686-pc-windows-msvc
 
-ARFLAGS := /out:"$@"
-
 else ifeq ($(TARGET),win-x64)
 
 CC := clang
@@ -60,8 +58,6 @@ LIB := $(BUILD_DIR)/plthook.lib
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DAMD64
 TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
 
-ARFLAGS := /out:"$@"
-
 else ifeq ($(TARGET),win-arm64)
 
 CC := clang
@@ -72,8 +68,6 @@ LIB := $(BUILD_DIR)/plthook.lib
 
 TARGET_CPPFLAGS := -DWIN32 -D_WIN32 -DARM64
 TARGET_CFLAGS := --target=arm64-pc-windows-msvc
-
-ARFLAGS := /out:"$@"
 
 else ifeq ($(TARGET),osx-x64)
 
@@ -109,7 +103,11 @@ DEPFILE := $(OBJECT:.o=.d)
 $(LIB): $(OBJECT)
 	@echo "AR $@"
 	@mkdir -p "$(BUILD_DIR)"
-	$(AR) $(ARFLAGS) "$^"
+ifeq ($(filter win-%,$(TARGET)),)
+	$(AR) $(ARFLAGS) "$@" "$^"
+else
+	$(AR) /out:"$@" "$^"
+endif
 
 $(OBJECT): $(SOURCE) plthook.h
 	@echo "CC $@"
