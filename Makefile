@@ -2,7 +2,7 @@ BUILD_DIR := build/$(TARGET)
 
 CFLAGS := -O2 -Wall -Wextra
 CPPFLAGS := -I. -MMD -MP
-ARFLAGS := rcs
+ARFLAGS := rcs "$@"
 
 ifeq ($(TARGET),linux-x86)
 
