@@ -34,7 +34,7 @@ SOURCE := plthook_elf.c
 LIB := $(BUILD_DIR)/libplthook.a
 
 TARGET_CPPFLAGS := -DARM64
-TARGET_CFLAGS := --target=aarch64-pc-linux-gnu
+TARGET_CFLAGS := --target=aarch64-pc-linux-gnu --sysroot=/usr/aarch64-linux-gnu
 
 else ifeq ($(TARGET),win-x86)
 
