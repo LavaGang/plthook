@@ -9,8 +9,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo dpkg --add-architecture i386
           sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libc6-dev-arm64-cross \
+            linux-libc-dev-arm64-cross
+          sudo dpkg --add-architecture i386
           sudo apt-get install -y \
             gcc-multilib \
             g++-multilib \
