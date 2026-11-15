@@ -39,7 +39,7 @@ TARGET_CFLAGS := --target=aarch64-pc-linux-gnu --sysroot=/usr/aarch64-linux-gnu
 else ifeq ($(TARGET),win-x86)
 
 CC := clang
-AR := ar
+AR := llvm-lib
 
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
@@ -50,7 +50,7 @@ TARGET_CFLAGS := --target=i686-pc-windows-msvc
 else ifeq ($(TARGET),win-x64)
 
 CC := clang
-AR := ar
+AR := llvm-lib
 
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
@@ -61,7 +61,7 @@ TARGET_CFLAGS := --target=x86_64-pc-windows-msvc
 else ifeq ($(TARGET),win-arm64)
 
 CC := clang
-AR := ar
+AR := llvm-lib
 
 SOURCE := plthook_win32.c
 LIB := $(BUILD_DIR)/plthook.lib
